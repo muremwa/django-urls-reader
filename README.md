@@ -3,7 +3,7 @@
 Prototyping a project for a _VS code_ extension to read urls from django projects.
 
 ## Usage
-All functions in `urls_reader.py`
+All functions in `python/urls_reader.py`
 1. `urls_finder`  
 Takes the text from a urls.py file and returns a dict with only one item.  
 `'app_name': ['list of raw, unprocessed urls',]`

@@ -5,6 +5,7 @@ import re
 import os
 import operator
 import functools
+import uuid
 
 
 class NotDjangoProject(BaseException):
@@ -45,12 +46,12 @@ def url_processor(string: str, app_name: str) -> list:
 
     if view.count('(') != view.count(')'):
         temp_view = list(view)
-        temp_view.remove(')')
+        if ')' in temp_view:
+            temp_view.remove(')')
         view = ''.join(temp_view)
 
     if len(path_parts) > 2:
         name = path_parts[2]
-
 
     if name:
         name = name.split("=")[-1]
@@ -63,7 +64,7 @@ def url_processor(string: str, app_name: str) -> list:
 
     view_name = None
 
-    if app_name == "no_app_name":
+    if "READER_FILE_PATH_" in app_name:
         view_name = f"{name}"
     else:
         if name:
@@ -72,9 +73,9 @@ def url_processor(string: str, app_name: str) -> list:
     return [view_name, args, view.strip(',')]
 
 
-def urls_finder(urls_file_text: str) -> dict:
+def urls_finder(urls_file_text: str, file_path: str) -> dict:
     """ get a urls.py file text and extract 'app_name' and all urls """
-    app_name = 'no_app_name'
+    app_name = f"READER_FILE_PATH_{file_path}"
     app_names = re.findall(r'app_name.*?$', urls_file_text, re.I | re.M)
     if app_names:
         app_name = app_names[0].split("=")[-1]
@@ -133,7 +134,7 @@ def main(path: str) -> dict:
     for url_file in url_files:
         with open(url_file, 'r') as f:
             text = f.read()
-            raw_urls = urls_finder(text)
+            raw_urls = urls_finder(text, url_file)
             urls.append(raw_urls)
 
     urls = [list(item.items()) for item in urls]

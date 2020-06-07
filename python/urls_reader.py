@@ -5,7 +5,6 @@ import re
 import os
 import operator
 import functools
-import uuid
 
 
 class NotDjangoProject(BaseException):

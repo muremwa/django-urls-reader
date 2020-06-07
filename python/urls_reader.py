@@ -7,6 +7,9 @@ import operator
 import functools
 
 
+from python import reader_util
+
+
 class NotDjangoProject(BaseException):
     """if the supplied path is not of a django project"""
     pass
@@ -34,31 +37,28 @@ def url_processor(string: str, app_name: str) -> list:
     if '_ROOT' in string:
         return []
 
-    path_parts = string.split(",")
+    view, name = None, None
 
-    pattern = path_parts[0]
-    view = path_parts[1].strip(' ')
-    name = None
+    possible_names = re.findall(r'[\s,]name=[\'\"](.*?)[\'\"].*?\)$', string, re.M | re.DOTALL)
 
-    if "Redirect" in view:
-        return []
+    if possible_names:
+        name = possible_names[0]
 
-    if view.count('(') != view.count(')'):
-        temp_view = list(view)
-        if ')' in temp_view:
-            temp_view.remove(')')
-        view = ''.join(temp_view)
-
-    if len(path_parts) > 2:
-        name = path_parts[2]
-
+    path_ending = '\)$'
     if name:
-        name = name.split("=")[-1]
-        name = list(name)
-        name = ''.join([s for s in name if s not in ['"', '\'', ')']])
+        path_ending = ','
+
+    possible_views = re.findall(r'[\'\"],[\s\n\t]*(.*?){ending}'.format(ending=path_ending), string, re.M | re.DOTALL)
+
+    if possible_views:
+        view = possible_views[0]
+
+    if view:
+        if "Redirect" in view:
+            return []
 
     args = tuple(
-        type_processor(arg.strip('<').strip('>')) for arg in re.findall(r'<.*?>', pattern)
+        type_processor(arg) for arg in re.findall(r'<(.*?)>', string)
     )
 
     view_name = None
@@ -69,30 +69,24 @@ def url_processor(string: str, app_name: str) -> list:
         if name:
             view_name = f"{app_name}:{name}"
 
-    return [view_name, args, view.strip(',')]
+    return [view_name, args, view]
 
 
 def urls_finder(urls_file_text: str, file_path: str) -> dict:
     """ get a urls.py file text and extract 'app_name' and all urls """
     app_name = f"READER_FILE_PATH_{file_path}"
-    app_names = re.findall(r'app_name.*?$', urls_file_text, re.I | re.M)
+
+    app_names = re.findall(r'app_name.*?[\'\"](.*?)[\'\"]', urls_file_text, re.I | re.M | re.DOTALL)
     if app_names:
-        app_name = app_names[0].split("=")[-1]
-        # ensure there are no spaces or " or '
-        app_name = ''.join(
-            [s for s in app_name if s not in ['\'', '"', ' ']]
-        )
+        app_name = ''.join([char for char in app_names[0] if char != ' '])
+
+    print("official app name >>", app_name)
 
     # extract urls
+    urlpatterns = reader_util.bracket_reader(urls_file_text, '[')
     urls = []
-    no_new_line_urls_file_text = urls_file_text.translate(str.maketrans('\n', '|'))
-    urlpatterns = re.findall(r'urlpatterns.*?\]', no_new_line_urls_file_text)
-
-    if urlpatterns:
-        urlpatterns = re.findall(r'\[.*?\]', urlpatterns[0])
-
-        if urlpatterns:
-            urls = re.findall(r'[^#]\s(\w+\(.*?\)),\|', urlpatterns[0])
+    for found in urlpatterns:
+        urls.extend(reader_util.bracket_reader(found, '('))
 
     return {app_name: tuple(urls)}
 
@@ -133,7 +127,10 @@ def main(path: str) -> dict:
     for url_file in url_files:
         with open(url_file, 'r') as f:
             text = f.read()
-            raw_urls = urls_finder(text, url_file)
+            try:
+                raw_urls = urls_finder(text, url_file)
+            except ValueError:
+                continue
             urls.append(raw_urls)
 
     urls = [list(item.items()) for item in urls]

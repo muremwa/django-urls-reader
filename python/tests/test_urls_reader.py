@@ -1,5 +1,5 @@
 import unittest
-import urls_reader
+from python import urls_reader
 
 
 class MyTestCase(unittest.TestCase):
@@ -52,25 +52,28 @@ class MyTestCase(unittest.TestCase):
 
         """
         example_file_1_result = {
-            'no_app_name': (
-                "url(r'^$', views.post_list, name='post_list')",
-                "url(r'^post/(?P<pk>\d+)/$', views.post_detail, name='post_detail')",
-                "url(r'^post/new/$', views.post_new, name='post_new')",
-                "url(r'^post/(?P<pk>\d+)/edit/$', views.post_edit, name='post_edit')",
-                "url(r'^post/(?P<pk>\d+)/edit/$', views.post_edit)"
+            'READER_FILE_PATH_C:\\Users\\files\\urls.py': (
+                "(r'^$', views.post_list, name='post_list')",
+                "(r'^post/(?P<pk>\d+)/$', views.post_detail, name='post_detail')",
+                "(r'^post/new/$', views.post_new, name='post_new')",
+                "(r'^post/(?P<pk>\d+)/edit/$', views.post_edit, name='post_edit')",
+                "(r'^post/(?P<pk>\d+)/edit/$', views.post_edit)"
             )
         }
         example_file_2_result = {
             'music': (
-                "path('', views.MusicIndex.as_view(), name=\"index\")",
-                "path('album/<slug:slug>/', views.AlbumPage.as_view(), name=\"album\")",
-                "path('artist/<slug:slug>/', views.ArtistPage.as_view(), name=\"artist\")",
-                "path('genre/<genre_name>/', views.GenrePage.as_view(), name=\"genre\")",
+                "('', views.MusicIndex.as_view(), name=\"index\")",
+                "('album/<slug:slug>/', views.AlbumPage.as_view(), name=\"album\")",
+                "('artist/<slug:slug>/', views.ArtistPage.as_view(), name=\"artist\")",
+                "('genre/<genre_name>/', views.GenrePage.as_view(), name=\"genre\")",
             )
         }
 
-        self.assertEqual(example_file_1_result, urls_reader.urls_finder(example_file_1))
-        self.assertEqual(example_file_2_result, urls_reader.urls_finder(example_file_2))
+        file_1 = "C:\\Users\\files\\urls.py"
+        file_2 = "C:\\Users\\files\\urls.py"
+
+        self.assertEqual(example_file_1_result, urls_reader.urls_finder(example_file_1, file_1))
+        self.assertEqual(example_file_2_result, urls_reader.urls_finder(example_file_2, file_2))
 
     def test_type_processor(self):
         self.assertEqual(urls_reader.type_processor("slug:slug"), ["slug", "slug"])
@@ -86,12 +89,12 @@ class MyTestCase(unittest.TestCase):
                 "path('hostel/<slug:slug>/<room_number>/now/', views.RoomBooking.as_view(), name='now')"
             ),
             'api': (
-                "url(r'^create/$', TweetCreateAPIView.as_view(), name='create')",
+                "url(r'^create/<int:user_id>/name/<str:token>/$', TweetCreateAPIView.as_view(), name='create')",
                 "url(r'^(?P<username>[\w.@+-]+)/$', TweetListAPIView.as_view(), name='user-tweets')",
                 "url(r'^create/$', TweetCreateAPIView.as_view())",
                 "path('', KimView.as_view(), name='doja')"
             ),
-            'no_app_name': (
+            'READER_FILE_PATH_C:\\Users\\files\\urls.py': (
                 "url(r'^create/$', TweetCreateAPIView.as_view(), name='create')",
                 "re_path('^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT})"
             )
@@ -105,12 +108,12 @@ class MyTestCase(unittest.TestCase):
                 ['tweet:now', (['slug', 'slug'], ['room_number', None]), 'views.RoomBooking.as_view()']
             ),
             'api': (
-                ['api:create', (), 'TweetCreateAPIView.as_view()'],
+                ['api:create', (['user_id', 'integer'], ['token', 'string']), 'TweetCreateAPIView.as_view()'],
                 ['api:user-tweets', (['username', None],), 'TweetListAPIView.as_view()'],
                 [None, (), 'TweetCreateAPIView.as_view()'],
                 ['api:doja', (), 'KimView.as_view()'],
             ),
-            'no_app_name': (
+            'READER_FILE_PATH_C:\\Users\\files\\urls.py': (
                 ['create', (), 'TweetCreateAPIView.as_view()'],
                 [],
             )

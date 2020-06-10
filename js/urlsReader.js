@@ -3,11 +3,17 @@ Takes a urls.py and reads all urls
 shall do the exact same thing as ../python/urls_reader.py
 */
 
+const readerUtil = require('./readerUtil');
+
 
 function typeProcessor(arg) {
+    /* 
+    if the type of an argument is defined map it correctly
+    */
     if (!arg) {
         return []
-    }
+    };
+
     const types = {slug: 'slug', int: 'integer', str: 'string'};
     let argList = arg.split(":");
 
@@ -37,23 +43,27 @@ function urlProcessor(string, appName) {
     */
     if ([string, appName].some(arg => arg === undefined)) {
         throw TypeError("all arguments not satisfied");
-    }    
+    };
 
     if ((typeof string !== 'string') || (typeof appName !== 'string')) {
         throw TypeError("wrong argument type: all arguments should be strings");
-    }
+    };
 
     if (string.includes('_ROOT')) {
         return [];
-    }
+    };
 
     let name = null;
     let view = null;
     let possibleNames;
     let possibleViews;
+    // reg ex for url name
     const namePattern = /[\s,]name=[\'\"](.*?)[\'\"].*?\)$/;
+    // reg ex for a view that has a name
     const viewPattern = /[\'\"],[\s\t\n]*(.+?),/;
+    // reg ex for a view that has no name
     const viewPatternNoName = /[\'\"],[\s\t\n]*(.+?)\)$/;
+    // reg ex for url argument
     const argsPattern = /<.*?>/g;
 
     // extract names
@@ -62,7 +72,7 @@ function urlProcessor(string, appName) {
         // the non global pattern returns an array in which the requested 
         // group is at index 1
         name = possibleNames[1];
-    }
+    };
 
     // extract view
     // if no name exists then choose the NoName pattern
@@ -99,73 +109,40 @@ function urlProcessor(string, appName) {
 };
 
 
-
-function bracketReader (stringToRead, braceToRead) {
+function urlsFinder (urlsFileText, filePath) {
     /* 
-    get to know where a bracket starts and is successfully closed
+    get a urls.py file text and extract 'app_name' and all urls
     */
-    if ([stringToRead, braceToRead].some(arg => arg === undefined)) {
-        throw TypeError('one of the arguments is undefined');
-    }
-
-    if (typeof stringToRead !== 'string' || typeof braceToRead !== 'string') {
-        throw TypeError('String to read is not a string');
-    }
-
-    const braces = {'{': '}', '[': ']', '(': ')'};
-    const partnerBrace = braces[braceToRead];
-
-    if (partnerBrace === undefined) {
-        throw TypeError(`${braceToRead} is not supported`);
-    }
-
-    const bracePositions = [];
-    const stringToReadAsList = [...stringToRead];
-    let position = 0;
-
-    const getItemIdex = function (item, index) {
-        if (index >= position) {
-            if (item === braceToRead) {
-                return true;
-            }
-        }
+    if ([urlsFileText, filePath].some(arg => arg === undefined || typeof arg !== 'string')) {
+        throw TypeError('Argument missing or of the wrong type');
     };
 
 
-            // a brace can only be closed if we are beyond index 'start'
-            if (index > start) {
-                if (strand === braceToRead) {
-                    // if it's anothe opening brace increment openingBraceCount
-                    openingBraceCount++;
-                } else if (strand === partnerBrace) {
-                    // if its a closing brace then decrement openingBraceCount
-                    openingBraceCount--;
-                };
-            };
-            // when opening_brace_count is 0, it means that an opened bracket is
-            // now closed and there's no need to proceed with the loop
-            // create an new position to find a new opening brace
-            if (openingBraceCount == 0) {
-                endPosition = +index;
-                position = +index;
-                break;
-            };
-        };
+    let appName = `READER_FILE_PATH_${filePath}`;
+    let urls = [];
 
-        // if it does not close raise a value error
-        if (openingBraceCount) {
-            throw Error(`No closing brace found!`);
-        };
-
-        // add the brace to brace positions [start, end_position] => [[start, end_position]]
-        bracePositions.push([start, endPosition]);
-
-        // check if there's a new brace?
-        start = stringToReadAsList.findIndex((item, index) => getItemIdex(item, index));
+    // reg ex for app name
+    const appNamePattern = /app_name.*?[\'\"](.*?)[\'\"]/;
+    
+    // extract app name
+    let possibleAppNames = urlsFileText.match(appNamePattern);
+    if (possibleAppNames) {
+        appName = possibleAppNames[1];
     };
 
-    // return a list of substrings of string with an open and corresponding closing brace
-    return bracePositions.map(
-        bracePos => stringToRead.substring(bracePos[0], bracePos[1] + 1).replace('\n', '')
-    );
+
+    // extract urls patterns first? they are enclosed in a list
+    const urlPatterns = readerUtil.bracketReader(urlsFileText, '[');
+
+    // extract url pattens
+    for (let urlPatternList of urlPatterns) {
+        urls = urls.concat(
+            readerUtil.bracketReader(urlPatternList, '(')
+        );
+    };
+
+    const solution = {};
+    solution[`${appName}`] = urls;
+
+    return solution;    
 };

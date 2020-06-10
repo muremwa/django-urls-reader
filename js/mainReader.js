@@ -132,3 +132,8 @@ function main(path) {
 
     return cleanUrls;
 };
+
+
+module.exports = {
+    reader: main
+};

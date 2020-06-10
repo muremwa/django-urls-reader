@@ -58,7 +58,7 @@ function urlProcessor(string, appName) {
     let possibleNames;
     let possibleViews;
     // reg ex for url name
-    const namePattern = /name=[\'\"](.*?)[\'\"]/;
+    const namePattern = /\bname=[\'\"](.*?)[\'\"]/;
     // reg ex for a view that has a name
     const viewPattern = /[\'\"],[\s\t\n]*(.+?),/;
     // reg ex for a view that has no name

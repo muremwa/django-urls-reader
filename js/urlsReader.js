@@ -146,3 +146,9 @@ function urlsFinder (urlsFileText, filePath) {
 
     return solution;    
 };
+
+
+module.exports = {
+    urlProcessor,
+    urlsFinder
+};

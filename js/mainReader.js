@@ -4,6 +4,8 @@ Look for urls.py and read all the urls paths declared
 
 const walk = require('walk');
 const fs = require('fs');
+const urlsReader = require('./urlsReader');
+
 
 function realProjectWalk (realProjectPath, options) {
     /* 
@@ -81,4 +83,52 @@ function walkProject(projectSourcePath) {
     walk.walkSync(projectSourcePath, options);
 
     return urlFiles;
+};
+
+
+function main(path) {
+    /* 
+        Combine all logic and get the urls defined in this format
+        {
+            appName: [
+                [urlName, [array of arrays of arguments], viewName/callback]
+            ],
+            ...
+        }
+    */
+    if (typeof path !== 'string') {
+        throw TypeError('Path is not a string');
+    };
+
+
+    // get all urls.py
+    const urlPyFiles = walkProject(path);
+
+    // get all urls in each urls.py file
+    let dirtyUrls = {};
+    for (let urlFile of urlPyFiles) {
+        // open files and retireve urlpatterns
+        let urlFileData = fs.readFileSync(urlFile, {
+            encoding: 'utf-8',
+            flag: 'r'
+        });
+        
+        // put all of them in one object called dirtyUrls
+        dirtyUrls = Object.assign(dirtyUrls, urlsReader.urlsFinder(urlFileData, urlFile));
+    };
+
+    // process dirty urls into clean urls
+    let cleanUrls = {};
+    for (let dirtyUrl of Object.keys(dirtyUrls)) {
+        let urls = dirtyUrls[dirtyUrl];
+        let cleanPyUrls = [];
+        
+        for (let url_ of urls) {
+            cleanPyUrls.push(urlsReader.urlProcessor(url_, dirtyUrl));
+        };
+
+        cleanUrls[`${dirtyUrl}`] = cleanPyUrls;
+    };
+
+    return cleanUrls;
 };

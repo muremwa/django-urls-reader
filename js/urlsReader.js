@@ -58,7 +58,7 @@ function urlProcessor(string, appName) {
     let possibleNames;
     let possibleViews;
     // reg ex for url name
-    const namePattern = /[\s,]name=[\'\"](.*?)[\'\"].*?\)$/;
+    const namePattern = /name=[\'\"](.*?)[\'\"]/;
     // reg ex for a view that has a name
     const viewPattern = /[\'\"],[\s\t\n]*(.+?),/;
     // reg ex for a view that has no name
@@ -71,7 +71,7 @@ function urlProcessor(string, appName) {
     if (possibleNames) {
         // the non global pattern returns an array in which the requested 
         // group is at index 1
-        name = possibleNames[1];
+        name = possibleNames[1].replace(' ', '');
     };
 
     // extract view

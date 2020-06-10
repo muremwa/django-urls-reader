@@ -80,8 +80,6 @@ def urls_finder(urls_file_text: str, file_path: str) -> dict:
     if app_names:
         app_name = ''.join([char for char in app_names[0] if char != ' '])
 
-    print("official app name >>", app_name)
-
     # extract urls
     urlpatterns = reader_util.bracket_reader(urls_file_text, '[')
     urls = []

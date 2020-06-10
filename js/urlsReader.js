@@ -131,16 +131,6 @@ function bracketReader (stringToRead, braceToRead) {
         }
     };
 
-    let start = stringToReadAsList.findIndex((item, index) => getItemIdex(item, index));
-
-    while (start > -1) {
-        endPosition = null;
-        openingBraceCount = 1;
-
-
-        // loop through the whole string and find the closing brace
-        for (let index in stringToReadAsList) {
-            let strand = stringToReadAsList[index];
 
             // a brace can only be closed if we are beyond index 'start'
             if (index > start) {

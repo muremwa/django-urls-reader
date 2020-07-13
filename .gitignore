@@ -3,3 +3,5 @@
 *chemo*
 .idea/*
 */extras/*
+*dist*
+.vscode

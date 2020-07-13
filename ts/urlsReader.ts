@@ -17,14 +17,16 @@ function typeProcessor(arg: string): string[] {
     if the type of an argument is defined map it correctly
     'str:name' -> 🏭 -> ['name', 'string']
     */
-    let argList = arg.split(":");
+    let procesedType: [string, string] = ['', ''];
 
-    if (argList.length == 2) {
+    const argList = arg.split(":");
+
+    if (argList.length === 2) {
         const argType = pathConvertes.has(argList[0])? pathConvertes.get(argList[0]): NO_TYPE;
-    } else {
-        // add null to the front of the array
-        argList.unshift(NO_TYPE);
+        procesedType = [argType!, argList[1]]
+    } else if (argList.length === 1) {
+        procesedType = [NO_TYPE, argList[0]]
     };
 
-    return argList.reverse();
+    return procesedType;
 };

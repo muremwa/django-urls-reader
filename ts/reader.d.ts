@@ -4,7 +4,7 @@
 */
 export interface ProcessedUrl {
     reverseName: string
-    arguments: string[][] | []
+    arguments: UrlArgument[] | []
     viewName: string | null
     hasArgs: boolean
 };
@@ -14,3 +14,11 @@ export interface ProcessedUrl {
     callback to handle a project not being a django project
 */
 export type notProjectHandler = (isNotProject: boolean) => void;
+
+/* 
+    urlConfig argument
+*/
+export interface UrlArgument {
+    name: string | null
+    argType: string | null
+};

@@ -1,4 +1,4 @@
-import { ProcessedUrl } from "./reader";
+import { ProcessedUrl, UrlArgument } from "./reader";
 import { bracketReader, brackets} from './readerUtil'
 
 const pathConvertes = new Map(
@@ -15,20 +15,23 @@ const pathConvertes = new Map(
 const NO_TYPE = 'NULL';
 
 
-function typeProcessor(arg: string): [string, string] {
+function typeProcessor(arg: string): UrlArgument {
     /* 
     if the type of an argument is defined map it correctly
-    'str:name' -> 🏭 -> ['name', 'string']
+    'str:name' -> 🏭 -> {name: 'name', argType: 'type'}
     */
-    let procesedType: [string, string] = ['', ''];
+    let procesedType: UrlArgument = {
+        name: null,
+        argType: null
+    };
 
     const argList = arg.split(":");
 
     if (argList.length === 2) {
-        const argType = pathConvertes.has(argList[0])? pathConvertes.get(argList[0]): NO_TYPE;
-        procesedType = [argType!, argList[1]]
+        const _argType = pathConvertes.has(argList[0])? pathConvertes.get(argList[0]): NO_TYPE;
+        procesedType = { name: _argType!, argType: argList[1]}
     } else if (argList.length === 1) {
-        procesedType = [NO_TYPE, argList[0]]
+        procesedType = {name: NO_TYPE, argType: argList[0]}
     };
 
     return procesedType;
@@ -59,7 +62,7 @@ function urlProcessor(urlString: string, appName: string): ProcessedUrl | null {
 
     let name: string | null = null;
     let viewArg: string | null = null;
-    let urlArgs: string[][] | [] = [];
+    let urlArgs: UrlArgument[] | []= [];
     let possibleNames: RegExpMatchArray | null;
     let possibleViews: RegExpMatchArray | null;
     // reg ex for url name
@@ -89,7 +92,7 @@ function urlProcessor(urlString: string, appName: string): ProcessedUrl | null {
     // extract arguments and process them
     let args = urlString.match(argsPattern);
     if (args && args.length > 0) {
-        urlArgs = args.map((arg: string): [string, string] => typeProcessor(arg.replace('<', '').replace('>', '')));
+        urlArgs = args.map((arg: string): UrlArgument => typeProcessor(arg.replace('<', '').replace('>', '')));
     };
     
     // create the view name

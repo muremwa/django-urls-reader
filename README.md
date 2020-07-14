@@ -34,7 +34,7 @@ Takes a raw, unprocessed url and cleans it to return a list with the reverse nam
     ```typescript
     interface ProcessedUrl {
         reverseName: string
-        arguments: string[][] | []
+        arguments: UrlArgument[] | []
         viewName: string | null
         hasArgs: boolean
     };
@@ -128,7 +128,12 @@ The TypeScript implementation would return:
     [ 
         {
             reverseName: 'tweet:update',
-            arguments: [['pk', 'NULL'],], 
+            arguments: [
+                {
+                    name: pk,
+                    argType: 'NULL'
+                },
+            ], 
             viewName: 'TweetUpdate.as_view()',
             hasArgs: true
         },
@@ -144,7 +149,16 @@ The TypeScript implementation would return:
 
         {
             reverseName: 'tweet:now', 
-            arguments: [['slug', 'slug'], ['room_number', 'NULL']], 
+            arguments: [
+                {
+                    name: 'slug',
+                    argType: 'slug'
+                }, 
+                {
+                    name: 'room_number',
+                    argType: 'NULL'
+                }
+            ], 
             viewName: 'views.RoomBooking.as_view()',
             hasArgs: true
         }

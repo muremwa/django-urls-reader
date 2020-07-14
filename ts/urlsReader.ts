@@ -1,4 +1,5 @@
 import { ProcessedUrl } from "./reader";
+import { bracketReader, brackets} from './readerUtil'
 
 const pathConvertes = new Map(
     [
@@ -99,5 +100,43 @@ function urlProcessor(urlString: string, appName: string): ProcessedUrl | null {
         arguments: urlArgs,
         viewName: viewArg,
         hasArgs: urlArgs.length > 0
+    };
+};
+
+
+function urlsFinder (urlsFileText: string, filePath:string): object {
+    /* 
+        get a urls.py file text and extract 'app_name' and all urls
+        {
+            appName: [
+                `url`,
+                `url2`,
+                `url3`
+            ]
+        }
+    */
+    let appName = `READER_FILE_PATH_${filePath}`;
+    let urls: string[] = [];
+
+    // reg ex for app name
+    const appNamePattern = /app_name.*?[\'\"](.*?)[\'\"]/;
+    
+    // extract app name
+    const possibleAppNames = urlsFileText.match(appNamePattern);
+    if (possibleAppNames) {
+        // target group is at index 1
+        appName = possibleAppNames[1];
+    };
+
+    // extract urls patterns first? they are enclosed in a list
+    const urlPatterns = bracketReader(urlsFileText, brackets.SQUARE_BRACKET);
+
+    // extract url pattens
+    for (let urlPatternList of urlPatterns) {
+        urls = urls.concat(bracketReader(urlPatternList, brackets.ROUND_BRACKET));
+    };
+
+    return {
+        [appName]: urls
     };
 };

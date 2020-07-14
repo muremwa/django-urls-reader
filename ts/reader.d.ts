@@ -9,7 +9,6 @@ export interface ProcessedUrl {
     hasArgs: boolean
 };
 
-
 /* 
     found urls by urlsFinder
 */
@@ -25,3 +24,13 @@ export interface UrlArgument {
     name: string | null
     argType: string | null
 };
+
+/* 
+    callback to handle a project not being a django project
+*/
+export type NotProjectHandler = (isNotProject: boolean) => void;
+
+/* 
+    returned by mainReader
+*/
+export interface MultipleAppUrls extends Map<string, ProcessedUrl[]> {}

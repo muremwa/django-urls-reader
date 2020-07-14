@@ -57,7 +57,7 @@ export function walkProject (projectSourcePath: string, notDjangoProjectHandler:
             next();
         } else {
             notProject = false
-            urls = realProjectWalk(join(root, manageDotPy.name), {filters});
+            urls = realProjectWalk(join(root), {filters});
         };
     };
 

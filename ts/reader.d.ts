@@ -8,3 +8,9 @@ export interface ProcessedUrl {
     viewName: string | null
     hasArgs: boolean
 };
+
+
+/* 
+    callback to handle a project not being a django project
+*/
+export type notProjectHandler = (isNotProject: boolean) => void;

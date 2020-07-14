@@ -2,11 +2,11 @@
 
 Prototyping a project for a _VS code_ extension to read urls from django projects.
 
-> The **JavaScript** implementation is being migrated to **TypeScript**. Once Done the JS shall be depracated!.
+> The **JavaScript** implementation has been migrated to **TypeScript**.
 
 ## Usage
-All functions in `python/urls_reader.py`, `python/reader_util.py`, `js/urlsReader.js`, `js/readerUtil.js` and `js/mainReader.js`.
-> Hunagarian notation shows javascript functions. eg. urlsFinder is javascript.  
+All functions in `python/urls_reader.py`, and `python/reader_util.py` for **Python** and `ts/urlsReader.ts`, `ts/readerUtil.ts` and `ts/mainReader.ts` for **TypeScript**.
+> Hunagarian notation shows TypeScript functions. eg. urlsFinder is TypeScript.  
 > Snake case shows python functions. eg. urls_finder is python.  
 
 
@@ -18,6 +18,13 @@ Takes the text from a urls.py file and returns a dict with only one item.
             'app_name': []
         }
     ```  
+    In TypeScript
+    ```typescript
+        {
+            appName: 'name',
+            urls: []
+        }
+    ```
 
 
 2. `url_processor` or `urlsProcessor`   
@@ -50,8 +57,14 @@ an `NotDjangoProject` exception(defined in the same file).
 `walkProject` goes ahead and searches for a folder with `manage.py` and assumes it's the project root. If none is found,
 it throws an `Error`.  
 
-4. `main`    
+4. `main` or `mainReader`  
 Combines all this logic on a whole project. It takes the root path as it's argument. Typically the entry point.
+In TypeScript a map object is returned with an `app_name` as key and an array of `ProcessedUrl` objects.
+```typescript
+    Map {
+        'appName': ProcessedUrl[]
+    }
+```
 
 ### Node modules needed
 1. walk - to travarse the file sytem.

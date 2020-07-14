@@ -1,4 +1,4 @@
-import { ProcessedUrl, UrlArgument } from "./reader";
+import { ProcessedUrl, UrlArgument, FoundUrls } from "./reader";
 import { bracketReader, brackets} from './readerUtil'
 
 const pathConvertes = new Map(
@@ -38,7 +38,7 @@ function typeProcessor(arg: string): UrlArgument {
 };
 
 
-function urlProcessor(urlString: string, appName: string): ProcessedUrl | null {
+export function urlProcessor(urlString: string, appName: string): ProcessedUrl | null {
     /* 
         Takes a string of path() and returns an object like ProcessedUrl
         extracts the view_name, url reverse name and all arguments from the url
@@ -46,7 +46,7 @@ function urlProcessor(urlString: string, appName: string): ProcessedUrl | null {
         {
             reverseName: 'reverse:name',
             arguments: [
-                ['arg', 'argType'] | []
+                {name: 'arg', argType: 'argType'}
             ],
             viewName: 'viewName',
             hasArgs: true | false?
@@ -107,7 +107,7 @@ function urlProcessor(urlString: string, appName: string): ProcessedUrl | null {
 };
 
 
-function urlsFinder (urlsFileText: string, filePath:string): object {
+export function urlsFinder (urlsFileText: string, filePath:string): FoundUrls {
     /* 
         get a urls.py file text and extract 'app_name' and all urls
         {
@@ -136,10 +136,8 @@ function urlsFinder (urlsFileText: string, filePath:string): object {
 
     // extract url pattens
     for (let urlPatternList of urlPatterns) {
-        urls = urls.concat(bracketReader(urlPatternList, brackets.ROUND_BRACKET));
+        urls.push(...bracketReader(urlPatternList, brackets.ROUND_BRACKET));
     };
 
-    return {
-        [appName]: urls
-    };
+    return {appName, urls};
 };

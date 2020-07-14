@@ -11,9 +11,12 @@ export interface ProcessedUrl {
 
 
 /* 
-    callback to handle a project not being a django project
+    found urls by urlsFinder
 */
-export type notProjectHandler = (isNotProject: boolean) => void;
+export interface FoundUrls {
+    appName: string
+    urls: string[] | []
+};
 
 /* 
     urlConfig argument

@@ -134,11 +134,11 @@ export function urlsFinder (urlsFileText: string, filePath:string, braceError?: 
     };
 
     // extract urls patterns first? they are enclosed in a list
-    const urlPatterns = bracketReader(urlsFileText, brackets.SQUARE_BRACKET, braceError);
+    const urlPatterns = bracketReader(urlsFileText, brackets.SQUARE_BRACKET, filePath, braceError);
 
     // extract url pattens
     for (let urlPatternList of urlPatterns) {
-        urls.push(...bracketReader(urlPatternList, brackets.ROUND_BRACKET, braceError));
+        urls.push(...bracketReader(urlPatternList, brackets.ROUND_BRACKET, filePath, braceError));
     };
 
     return {appName, urls};

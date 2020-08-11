@@ -33,7 +33,7 @@ export type NotProjectHandler = (isNotProject: boolean) => void;
 /* 
     callback to handle a project not being a django project
 */
-export type braceNotComplete = (braceType: string) => void;
+export type braceNotComplete = (braceType: string, filePath?: string) => void;
 
 /* 
     returned by mainReader

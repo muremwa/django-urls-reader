@@ -18,7 +18,7 @@ const patnerBraces = new Map(
 );
 
 
-export function bracketReader(stringToRead: string, braceToRead: string, closingBraceNotFound?: braceNotComplete): string[] {
+export function bracketReader(stringToRead: string, braceToRead: string, filePath?: string, closingBraceNotFound?: braceNotComplete): string[] {
     /* 
     get to know where a bracket starts and is successfully closed
     */
@@ -81,7 +81,7 @@ export function bracketReader(stringToRead: string, braceToRead: string, closing
         // if it does not close raise a value error
         if (openingBraceCount) {
             if (closingBraceNotFound) {
-                closingBraceNotFound(partnerBrace!);
+                closingBraceNotFound(partnerBrace!, filePath);
                 break;
             } else {
                 throw new Error(`No closing brace found!`);

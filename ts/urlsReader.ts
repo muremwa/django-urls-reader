@@ -29,9 +29,11 @@ function typeProcessor(arg: string): UrlArgument {
 
     if (argList.length === 2) {
         const _argType = pathConvertes.has(argList[0])? pathConvertes.get(argList[0]): NO_TYPE;
-        procesedType = { name: _argType!, argType: argList[1]}
+        // procesedType = { name: _argType!, argType: argList[1]}
+        procesedType = { name: argList[1], argType: _argType!}
     } else if (argList.length === 1) {
-        procesedType = {name: NO_TYPE, argType: argList[0]}
+        // procesedType = {name: NO_TYPE, argType: argList[0]}
+        procesedType = {name: argList[0], argType: NO_TYPE}
     };
 
     return procesedType;

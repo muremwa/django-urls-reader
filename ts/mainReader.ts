@@ -127,7 +127,6 @@ export function mainReader (path: string, notDjangoProjectHandler?: NotProjectHa
         const dirtyUrls = urlsFinder(urlDotPyText, urlDotPy);
 
         if (dirtyUrls.urls.length > 0) {
-            // const processedUrls = [...dirtyUrls.urls].map((url) => urlProcessor(url, dirtyUrls.appName)!);
             const processedUrls = [...dirtyUrls.urls].map((url) => urlProcessor(url, dirtyUrls.appName)!).filter((url) => url !== null);
             if (processedUrls.length > 0) {
                 readUrls.set(dirtyUrls.appName, processedUrls);

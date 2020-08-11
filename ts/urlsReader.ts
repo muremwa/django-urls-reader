@@ -124,7 +124,7 @@ export function urlsFinder (urlsFileText: string, filePath:string, braceError?: 
     let urls: string[] = [];
 
     // reg ex for app name
-    const appNamePattern = /app_name.*?[\'\"](.*?)[\'\"]/;
+    const appNamePattern = /^app_name.*?[\'\"](.*?)[\'\"]/m;
     
     // extract app name
     const possibleAppNames = urlsFileText.match(appNamePattern);

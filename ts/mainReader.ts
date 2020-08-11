@@ -3,7 +3,7 @@ import { readFileSync } from 'fs';
 
 import { walkSync, WalkOptions, WalkStatArrayEventCallback, WalkOptionsListeners } from 'walk';
 
-import { NotProjectHandler, ProcessedUrl, MultipleAppUrls } from './reader';
+import { NotProjectHandler, ProcessedUrl, MultipleAppUrls, braceNotComplete } from './reader';
 import { urlsFinder, urlProcessor } from './urlsReader'
 
 
@@ -90,7 +90,7 @@ function walkProject (projectSourcePath: string, notDjangoProjectHandler: NotPro
 };
 
 
-export function mainReader (path: string, notDjangoProjectHandler?: NotProjectHandler): MultipleAppUrls {
+export function mainReader (path: string, notDjangoProjectHandler?: NotProjectHandler, braceError?: braceNotComplete): MultipleAppUrls {
     /* 
         path is a project path 
         read all urls and return a Map with the following items
@@ -124,7 +124,7 @@ export function mainReader (path: string, notDjangoProjectHandler?: NotProjectHa
     // loop through all url config files and extract all urls and process them
     for (const urlDotPy of urlConfFiles) {
         const urlDotPyText = readFileSync(urlDotPy, {encoding: 'utf-8', flag: 'r'});
-        const dirtyUrls = urlsFinder(urlDotPyText, urlDotPy);
+        const dirtyUrls = urlsFinder(urlDotPyText, urlDotPy, braceError);
 
         if (dirtyUrls.urls.length > 0) {
             const processedUrls = [...dirtyUrls.urls].map((url) => urlProcessor(url, dirtyUrls.appName)!).filter((url) => url !== null);

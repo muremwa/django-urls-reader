@@ -1,4 +1,4 @@
-import { ProcessedUrl, UrlArgument, FoundUrls } from "./reader";
+import { ProcessedUrl, UrlArgument, FoundUrls, braceNotComplete } from "./reader";
 import { bracketReader, brackets} from './readerUtil'
 
 const pathConvertes = new Map(
@@ -109,7 +109,7 @@ export function urlProcessor(urlString: string, appName: string): ProcessedUrl |
 };
 
 
-export function urlsFinder (urlsFileText: string, filePath:string): FoundUrls {
+export function urlsFinder (urlsFileText: string, filePath:string, braceError?: braceNotComplete): FoundUrls {
     /* 
         get a urls.py file text and extract 'app_name' and all urls
         {
@@ -134,11 +134,11 @@ export function urlsFinder (urlsFileText: string, filePath:string): FoundUrls {
     };
 
     // extract urls patterns first? they are enclosed in a list
-    const urlPatterns = bracketReader(urlsFileText, brackets.SQUARE_BRACKET);
+    const urlPatterns = bracketReader(urlsFileText, brackets.SQUARE_BRACKET, braceError);
 
     // extract url pattens
     for (let urlPatternList of urlPatterns) {
-        urls.push(...bracketReader(urlPatternList, brackets.ROUND_BRACKET));
+        urls.push(...bracketReader(urlPatternList, brackets.ROUND_BRACKET, braceError));
     };
 
     return {appName, urls};

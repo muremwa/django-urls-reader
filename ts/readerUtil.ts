@@ -1,3 +1,5 @@
+import { braceNotComplete } from "./reader";
+
 export const brackets = {
     ROUND_BRACKET: '(',
     SQUARE_BRACKET: '[',
@@ -16,7 +18,7 @@ const patnerBraces = new Map(
 );
 
 
-export function bracketReader(stringToRead: string, braceToRead: string): string[] {
+export function bracketReader(stringToRead: string, braceToRead: string, closingBraceNotFound?: braceNotComplete): string[] {
     /* 
     get to know where a bracket starts and is successfully closed
     */
@@ -78,7 +80,12 @@ export function bracketReader(stringToRead: string, braceToRead: string): string
 
         // if it does not close raise a value error
         if (openingBraceCount) {
-            throw new Error(`No closing brace found!`);
+            if (closingBraceNotFound) {
+                closingBraceNotFound(partnerBrace!);
+                break;
+            } else {
+                throw new Error(`No closing brace found!`);
+            }
         };
 
         // add the brace to brace positions [start, end_position] => [[start, end_position]]
